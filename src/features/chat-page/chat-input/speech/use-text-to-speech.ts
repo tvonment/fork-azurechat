@@ -39,6 +39,8 @@ class TextToSpeech {
       tokenObj.region
     );
 
+    speechConfig.speechSynthesisVoiceName = "en-US-AndrewNeural";
+
     player = new SpeakerAudioDestination();
 
     var audioConfig = AudioConfig.fromSpeakerOutput(player);

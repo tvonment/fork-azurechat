@@ -11,7 +11,7 @@ param location string
 
 // azure open ai -- only regions supporting gpt-35-turbo v1106
 @description('Location for the OpenAI resource group')
-@allowed(['australiaeast', 'canadaeast', 'francecentral', 'southindia', 'uksouth', 'swedencentral', 'westus'])
+@allowed([ 'australiaeast', 'canadaeast', 'francecentral', 'southindia', 'uksouth', 'swedencentral', 'westus' ])
 @metadata({
   azd: {
     type: 'location'
@@ -32,7 +32,7 @@ param embeddingModelName string = 'text-embedding-ada-002'
 
 // DALL-E v3 only supported in Sweden Central for now
 @description('Location for the OpenAI DALL-E 3 instance resource group')
-@allowed(['swedencentral'])
+@allowed([ 'swedencentral' ])
 param dalleLocation string
 
 param dalleDeploymentCapacity int = 1
@@ -42,7 +42,7 @@ param dalleApiVersion string = '2023-12-01-preview'
 
 // DALL-E v3 only supported in Sweden Central for now
 @description('Location for the GPT vision instance resource')
-@allowed(['swedencentral','westus',])
+@allowed([ 'swedencentral', 'westus', ])
 param gptvisionLocation string
 
 param gptvisionDeploymentCapacity int = 1
@@ -56,10 +56,15 @@ param searchServiceIndexName string = 'azure-chat'
 param searchServiceSkuName string = 'standard'
 
 // TODO: define good default Sku and settings for storage account
-param storageServiceSku object = { name: 'Standard_LRS' } 
+param storageServiceSku object = { name: 'Standard_LRS' }
 param storageServiceImageContainerName string = 'images'
 
-param resourceGroupName string = ''
+param resourceGroupName string = toUpper('RG-CHAT-${name}')
+
+param b2cAzureAdClientId string
+@secure()
+param b2cAzureAdClientSecret string
+param b2cAzureAdTenantId string
 
 var resourceToken = toLower(uniqueString(subscription().id, name, location))
 var tags = { 'azd-env-name': name }
@@ -105,6 +110,9 @@ module resources 'resources.bicep' = {
     storageServiceSku: storageServiceSku
     storageServiceImageContainerName: storageServiceImageContainerName
     location: location
+    b2cAzureAdClientId: b2cAzureAdClientId
+    b2cAzureAdClientSecret: b2cAzureAdClientSecret
+    b2cAzureAdTenantId: b2cAzureAdTenantId
   }
 }
 

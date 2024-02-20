@@ -38,6 +38,11 @@ param storageServiceImageContainerName string
 
 param location string = resourceGroup().location
 
+param b2cAzureAdClientId string
+@secure()
+param b2cAzureAdClientSecret string
+param b2cAzureAdTenantId string
+
 @secure()
 param nextAuthHash string = uniqueString(newGuid())
 
@@ -102,10 +107,10 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
     reserved: true
   }
   sku: {
-    name: 'P0v3'
-    tier: 'Premium0V3'
-    size: 'P0v3'
-    family: 'Pv3'
+    name: 'B1' // Basic tier
+    tier: 'Basic'
+    size: 'B1'
+    family: 'B'
     capacity: 1
   }
   kind: 'linux'
@@ -124,12 +129,12 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
       appCommandLine: 'next start'
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
-      appSettings: [ 
-        { 
+      appSettings: [
+        {
           name: 'AZURE_KEY_VAULT_NAME'
           value: keyVaultName
         }
-        { 
+        {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
           value: 'true'
         }
@@ -205,18 +210,18 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
           name: 'AZURE_SEARCH_API_KEY'
           value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_SEARCH_API_KEY.name})'
         }
-        { 
+        {
           name: 'AZURE_SEARCH_NAME'
           value: search_name
         }
-        { 
+        {
           name: 'AZURE_SEARCH_INDEX_NAME'
           value: searchServiceIndexName
         }
-        { 
+        {
           name: 'AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT'
           value: 'https://${form_recognizer_name}.cognitiveservices.azure.com/'
-        }        
+        }
         {
           name: 'AZURE_DOCUMENT_INTELLIGENCE_KEY'
           value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_DOCUMENT_INTELLIGENCE_KEY.name})'
@@ -237,10 +242,22 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
           name: 'AZURE_STORAGE_ACCOUNT_KEY'
           value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_STORAGE_ACCOUNT_KEY.name})'
         }
+        {
+          name: 'AZURE_AD_CLIENT_ID'
+          value: b2cAzureAdClientId
+        }
+        {
+          name: 'AZURE_AD_CLIENT_SECRET'
+          value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_AD_CLIENT_SECRET.name})'
+        }
+        {
+          name: 'AZURE_AD_TENANT_ID'
+          value: b2cAzureAdTenantId
+        }
       ]
     }
   }
-  identity: { type: 'SystemAssigned'}
+  identity: { type: 'SystemAssigned' }
 
   resource configLogs 'config' = {
     name: 'logs'
@@ -367,6 +384,14 @@ resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
     properties: {
       contentType: 'text/plain'
       value: storage.listKeys().keys[0].value
+    }
+  }
+
+  resource AZURE_AD_CLIENT_SECRET 'secrets' = {
+    name: 'AZURE-AD-CLIENT-SECRET'
+    properties: {
+      contentType: 'text/plain'
+      value: b2cAzureAdClientSecret
     }
   }
 }
@@ -514,8 +539,6 @@ resource azureopenaidalle 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   }
 }
 
-
-
 resource azureopenaivision 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   name: openai_gpt_vision_name
   location: gptvisionLocation
@@ -535,7 +558,7 @@ resource azureopenaivision 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
       model: {
         format: 'OpenAI'
         name: gptvisionModelName
-        version:gptvisionModelVersion
+        version: gptvisionModelVersion
       }
     }
     sku: {
