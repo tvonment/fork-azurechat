@@ -1,6 +1,7 @@
 param name string = 'azurechat-demo'
 param resourceToken string
-
+param fqdm string = 'https://chat.vonmentlen.info'
+param fqdmPreview string = 'https://preview.chat.vonmentlen.info'
 param openai_api_version string
 
 param openAiLocation string
@@ -9,6 +10,9 @@ param chatGptDeploymentCapacity int = 30
 param chatGptDeploymentName string = 'chat-gpt-35-turbo'
 param chatGptModelName string = 'chat-gpt-35-turbo'
 param chatGptModelVersion string = '1106'
+param chatGptDeploymentName4 string = 'chat-gpt-4-turbo'
+param chatGptModelName4 string = 'gpt-4'
+param chatGptModelVersion4 string = '1106-Preview'
 param embeddingDeploymentName string = 'text-embedding-ada-002'
 param embeddingDeploymentCapacity int = 10
 param embeddingModelName string = 'text-embedding-ada-002'
@@ -82,6 +86,18 @@ var llmDeployments = [
       format: 'OpenAI'
       name: chatGptModelName
       version: chatGptModelVersion
+    }
+    sku: {
+      name: 'Standard'
+      capacity: chatGptDeploymentCapacity
+    }
+  }
+  {
+    name: chatGptDeploymentName4
+    model: {
+      format: 'OpenAI'
+      name: chatGptModelName4
+      version: chatGptModelVersion4
     }
     sku: {
       name: 'Standard'
@@ -196,7 +212,161 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'NEXTAUTH_URL'
-          value: 'https://${webapp_name}.azurewebsites.net'
+          value: fqdm
+        }
+        {
+          name: 'AZURE_COSMOSDB_URI'
+          value: cosmosDbAccount.properties.documentEndpoint
+        }
+        {
+          name: 'AZURE_COSMOSDB_KEY'
+          value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_COSMOSDB_KEY.name})'
+        }
+        {
+          name: 'AZURE_SEARCH_API_KEY'
+          value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_SEARCH_API_KEY.name})'
+        }
+        {
+          name: 'AZURE_SEARCH_NAME'
+          value: search_name
+        }
+        {
+          name: 'AZURE_SEARCH_INDEX_NAME'
+          value: searchServiceIndexName
+        }
+        {
+          name: 'AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT'
+          value: 'https://${form_recognizer_name}.cognitiveservices.azure.com/'
+        }
+        {
+          name: 'AZURE_DOCUMENT_INTELLIGENCE_KEY'
+          value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_DOCUMENT_INTELLIGENCE_KEY.name})'
+        }
+        {
+          name: 'AZURE_SPEECH_REGION'
+          value: location
+        }
+        {
+          name: 'AZURE_SPEECH_KEY'
+          value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_SPEECH_KEY.name})'
+        }
+        {
+          name: 'AZURE_STORAGE_ACCOUNT_NAME'
+          value: storage_name
+        }
+        {
+          name: 'AZURE_STORAGE_ACCOUNT_KEY'
+          value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_STORAGE_ACCOUNT_KEY.name})'
+        }
+        {
+          name: 'AZURE_AD_CLIENT_ID'
+          value: b2cAzureAdClientId
+        }
+        {
+          name: 'AZURE_AD_CLIENT_SECRET'
+          value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_AD_CLIENT_SECRET.name})'
+        }
+        {
+          name: 'AZURE_AD_TENANT_ID'
+          value: b2cAzureAdTenantId
+        }
+      ]
+    }
+  }
+  identity: { type: 'SystemAssigned' }
+
+  resource configLogs 'config' = {
+    name: 'logs'
+    properties: {
+      applicationLogs: { fileSystem: { level: 'Verbose' } }
+      detailedErrorMessages: { enabled: true }
+      failedRequestsTracing: { enabled: true }
+      httpLogs: { fileSystem: { enabled: true, retentionInDays: 1, retentionInMb: 35 } }
+    }
+  }
+}
+
+resource webAppPreview 'Microsoft.Web/sites@2020-06-01' = {
+  name: '${webapp_name}-preview'
+  location: location
+  tags: union(tags, { 'azd-service-name': 'frontend-preview' })
+  properties: {
+    serverFarmId: appServicePlan.id
+    httpsOnly: true
+    siteConfig: {
+      linuxFxVersion: 'node|18-lts'
+      alwaysOn: true
+      appCommandLine: 'next start'
+      ftpsState: 'Disabled'
+      minTlsVersion: '1.2'
+      appSettings: [
+        {
+          name: 'AZURE_KEY_VAULT_NAME'
+          value: keyVaultName
+        }
+        {
+          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+          value: 'true'
+        }
+        {
+          name: 'AZURE_OPENAI_VISION_API_KEY'
+          value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_OPENAI_VISION_API_KEY.name})'
+        }
+        {
+          name: 'AZURE_OPENAI_VISION_API_INSTANCE_NAME'
+          value: openai_gpt_vision_name
+        }
+        {
+          name: 'AZURE_OPENAI_VISION_API_DEPLOYMENT_NAME'
+          value: gptvisionDeploymentName
+        }
+        {
+          name: 'AZURE_OPENAI_VISION_API_VERSION'
+          value: gptvisionApiVersion
+        }
+        {
+          name: 'AZURE_OPENAI_API_KEY'
+          value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_OPENAI_API_KEY.name})'
+        }
+        {
+          name: 'AZURE_OPENAI_API_INSTANCE_NAME'
+          value: openai_name
+        }
+        {
+          name: 'AZURE_OPENAI_API_DEPLOYMENT_NAME'
+          value: chatGptDeploymentName4
+        }
+        {
+          name: 'AZURE_OPENAI_API_EMBEDDINGS_DEPLOYMENT_NAME'
+          value: embeddingDeploymentName
+        }
+        {
+          name: 'AZURE_OPENAI_API_VERSION'
+          value: openai_api_version
+        }
+        {
+          name: 'AZURE_OPENAI_DALLE_API_KEY'
+          value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_OPENAI_DALLE_API_KEY.name})'
+        }
+        {
+          name: 'AZURE_OPENAI_DALLE_API_INSTANCE_NAME'
+          value: openai_dalle_name
+        }
+        {
+          name: 'AZURE_OPENAI_DALLE_API_DEPLOYMENT_NAME'
+          value: dalleDeploymentName
+        }
+        {
+          name: 'AZURE_OPENAI_DALLE_API_VERSION'
+          value: dalleApiVersion
+        }
+        {
+          name: 'NEXTAUTH_SECRET'
+          value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::NEXTAUTH_SECRET.name})'
+        }
+        {
+          name: 'NEXTAUTH_URL'
+          value: fqdmPreview
         }
         {
           name: 'AZURE_COSMOSDB_URI'

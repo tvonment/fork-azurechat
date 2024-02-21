@@ -8,6 +8,10 @@ services:
     project: ./src
     language: ts
     host: appservice
+  frontend-preview:
+    project: ./src
+    language: ts
+    host: appservice
 hooks:
   postdeploy:
     posix:
