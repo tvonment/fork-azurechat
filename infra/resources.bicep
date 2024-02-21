@@ -470,6 +470,16 @@ resource kvFunctionAppPermissions 'Microsoft.Authorization/roleAssignments@2020-
   }
 }
 
+resource kvFunctionAppPermissionsPreview 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(kv.id, webAppPreview.name, keyVaultSecretsOfficerRole)
+  scope: kv
+  properties: {
+    principalId: webAppPreview.identity.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: keyVaultSecretsOfficerRole
+  }
+}
+
 resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
   name: keyVaultName
   location: location
