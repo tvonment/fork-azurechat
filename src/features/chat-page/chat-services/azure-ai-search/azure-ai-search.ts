@@ -17,6 +17,7 @@ import {
 
 export interface AzureSearchDocumentIndex {
   id: string;
+  content: string;
   pageContent: string;
   embedding?: number[];
   user: string;
@@ -174,12 +175,15 @@ export const ExtensionSimilaritySearch = async (props: {
           newDocument[key] = document[key];
         }
       }
+      console.log("oldDocument", document);
+      console.log("newDocument", newDocument);
 
       results.push({
         score: result.score,
         document: newDocument, // Use the newDocument object instead of the original document
       });
     }
+    console.log("🟢 Retrieving documents", results);
 
     return {
       status: "OK",
@@ -211,6 +215,7 @@ export const IndexDocuments = async (
         chatThreadId,
         user: await userHashedId(),
         pageContent: doc,
+        content: doc,
         metadata: fileName,
         embedding: [],
       };

@@ -107,6 +107,7 @@ export const FormatCitations = (citation: DocumentSearchResponse[]) => {
       score: d.score,
       document: {
         metadata: d.document.metadata,
+        content: d.document.content,
         pageContent: d.document.pageContent,
         chatThreadId: d.document.chatThreadId,
         id: "",
