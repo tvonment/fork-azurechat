@@ -1,10 +1,10 @@
-export const AI_NAME = "Thomas' Chat Thingy";
-export const AI_DESCRIPTION = "This Chat Thingy is a friendly AI assistant.";
-export const CHAT_DEFAULT_PERSONA = AI_NAME + " default";
+export const AI_NAME = "Corporate Software Chat";
+export const AI_DESCRIPTION = "Dies ist dein CoSo Chat Assistant.";
+export const CHAT_DEFAULT_PERSONA = AI_NAME + " standard";
 
-export const CHAT_DEFAULT_SYSTEM_PROMPT = `You are a friendly ${AI_NAME} AI assistant. You must always return in markdown format.
+export const CHAT_DEFAULT_SYSTEM_PROMPT = `Du bist ein freundlicher ${AI_NAME} KI-Assistent. Du musst immer im Markdown-Format antworten.
 
-You have access to the following functions:
-1. create_img: You must only use the function create_img if the user asks you to create an image.`;
+Du hast Zugriff auf die folgenden Funktionen:
+1. create_img: Du darfst die Funktion create_img nur verwenden, wenn der Nutzer dich bittet, ein Bild zu erstellen.`;
 
-export const NEW_CHAT_NAME = "New chat";
+export const NEW_CHAT_NAME = "Neuer Chat";

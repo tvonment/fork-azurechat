@@ -1,7 +1,5 @@
-param name string = 'azurechat-demo'
+param name string = 'azurechat'
 param resourceToken string
-param fqdm string = 'https://chat.vonmentlen.info'
-param fqdmPreview string = 'https://preview.chat.vonmentlen.info'
 param openai_api_version string
 
 param openAiLocation string
@@ -12,7 +10,7 @@ param chatGptModelName string = 'chat-gpt-35-turbo'
 param chatGptModelVersion string = '1106'
 param chatGptDeploymentName4 string = 'chat-gpt-4-turbo'
 param chatGptModelName4 string = 'gpt-4'
-param chatGptModelVersion4 string = '1106-Preview'
+param chatGptModelVersion4 string = '0613-Preview'
 param embeddingDeploymentName string = 'text-embedding-ada-002'
 param embeddingDeploymentCapacity int = 10
 param embeddingModelName string = 'text-embedding-ada-002'
@@ -34,7 +32,7 @@ param speechServiceSkuName string = 'S0'
 
 param formRecognizerSkuName string = 'S0'
 
-param searchServiceSkuName string = 'standard'
+param searchServiceSkuName string = 'basic'
 param searchServiceIndexName string = 'azure-chat'
 
 param storageServiceSku object
@@ -212,7 +210,7 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'NEXTAUTH_URL'
-          value: fqdm
+          value: 'https://${webapp_name}.azurewebsites.net'
         }
         {
           name: 'AZURE_COSMOSDB_URI'
@@ -366,7 +364,7 @@ resource webAppPreview 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'NEXTAUTH_URL'
-          value: fqdmPreview
+          value: 'https://${webapp_name}-preview.azurewebsites.net'
         }
         {
           name: 'AZURE_COSMOSDB_URI'
