@@ -59,7 +59,8 @@ param searchServiceSkuName string = 'standard'
 param storageServiceSku object = { name: 'Standard_LRS' }
 param storageServiceImageContainerName string = 'images'
 
-param resourceGroupName string = toUpper('RG-CHAT-${name}')
+param resourceGroupName string = toLower('RG-${name}-CHAT')
+
 
 param b2cAzureAdClientId string
 @secure()

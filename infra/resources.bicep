@@ -1,7 +1,7 @@
 param name string = 'azurechat-demo'
 param resourceToken string
-param fqdm string = 'https://chat.vonmentlen.info'
-param fqdmPreview string = 'https://preview.chat.vonmentlen.info'
+param fqdm string = 'https://chat.corporatesoftware.ch'
+param fqdmPreview string = 'https://preview.chat.corporatesoftware.ch'
 param openai_api_version string
 
 param openAiLocation string
