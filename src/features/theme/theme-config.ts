@@ -1,5 +1,5 @@
 export const AI_NAME = "Thomas' Chat Thingy";
-export const AI_DESCRIPTION = "This Chat Thingy is a friendly AI assistant.";
+export const AI_DESCRIPTION = "This Chat Thingy is a friendly AI assistant. (powered with Azure OpenAI gpt-4o)";
 export const CHAT_DEFAULT_PERSONA = AI_NAME + " default";
 
 export const CHAT_DEFAULT_SYSTEM_PROMPT = `You are a friendly ${AI_NAME} AI assistant. You must always return in markdown format.
